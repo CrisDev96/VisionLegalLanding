@@ -2,6 +2,7 @@ function sendMail() {
   const firstName = document.getElementById("first-name").value.trim();
   const lastName = document.getElementById("last-name").value.trim();
   const emailUser = document.getElementById("email-user").value.trim();
+  const numberUser = document.getElementById("number-user").value.trim();
   const serviceRequired = document.getElementById("service-required").value;
   const message = document.getElementById("message").value.trim();
 
@@ -25,6 +26,8 @@ function sendMail() {
   const nameRegex = /^[A-Za-zÁ-ÿñÑ\s]+$/;
   // Validación básica de correo electrónico
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  // Validación de número de contacto (solo números)
+  const phoneRegex = /^[0-9]+$/;
 
   let hasError = false;
 
@@ -44,6 +47,11 @@ function sendMail() {
     hasError = true;
   }
 
+  if (!numberUser || !phoneRegex.test(numberUser)) {
+    showError("number-user", "Ingresa un número de contacto válido (solo números).");
+    hasError = true;
+  }
+
   if (serviceRequired === "Selecciona un servicio..." || serviceRequired === "") {
     showError("service-required", "Selecciona un servicio válido de la lista.");
     hasError = true;
@@ -57,6 +65,7 @@ function sendMail() {
     firstName: firstName,
     lastName: lastName,
     emailUser: emailUser,
+    numberUser: numberUser,
     serviceRequired: serviceRequired,
     message: message,
   };
