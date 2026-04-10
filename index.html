@@ -37,11 +37,22 @@
   </style>
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js">
   </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
   <script type="text/javascript">
       (function () {
-        emailjs.init({
-          publicKey: "CE5F4H9gNBK9IcrNs",
-        });
+        // Obtenemos el YAML y lo parseamos
+        fetch('config.yaml')
+          .then(res => res.text())
+          .then(yamlText => {
+            // Guardamos la configuración de manera global para poder usarla en main.js
+            window.appConfig = jsyaml.load(yamlText);
+            
+            // Inicializamos EmailJS con la llave pública
+            emailjs.init({
+              publicKey: window.appConfig.emailJSPublicKey,
+            });
+          })
+          .catch(err => console.error("Error al cargar config.yaml", err));
       })();
   </script>
 </head>

@@ -83,8 +83,8 @@ function sendMail() {
   submitBtn.disabled = true;
   submitBtn.classList.add("opacity-70", "cursor-not-allowed");
 
-  // Enviar el formulario a EmailJS
-  emailjs.send("service_a8k1gfj", "template_qs4saio", params)
+  // Enviar el formulario a EmailJS usando las variables cargadas desde el config.yaml
+  emailjs.send(window.appConfig.emailJSService, window.appConfig.emailJSTemplate, params)
     .then((response) => {
       // Ocultar error por si acaso y mostrar el mensaje de éxito en la interfaz
       if (errorMsg) errorMsg.classList.add("hidden");
