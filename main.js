@@ -57,6 +57,13 @@ function sendMail() {
     hasError = true;
   }
 
+  // Validar reCAPTCHA
+  const captchaResponse = grecaptcha.getResponse();
+  if (!captchaResponse) {
+    showError("captcha", "Por favor, completa el reCAPTCHA.");
+    hasError = true;
+  }
+
   if (hasError) {
     return; // Detener el envío si hay errores
   }
@@ -98,12 +105,14 @@ function sendMail() {
       
       // Limpiar los datos del formulario
       document.getElementById("contact-form").reset();
+      grecaptcha.reset();
     })
     .catch((error) => {
       console.error("Error al enviar:", error);
       // Mostrar el mensaje de error en la interfaz
       if (errorMsg) errorMsg.classList.remove("hidden");
       if (successMsg) successMsg.classList.add("hidden");
+      grecaptcha.reset();
     })
     .finally(() => {
       // Restaurar el botón independientemente del resultado

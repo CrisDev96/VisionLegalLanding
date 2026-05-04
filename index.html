@@ -55,6 +55,7 @@
           .catch(err => console.error("Error al cargar config.yaml", err));
       })();
   </script>
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 
 <body class="bg-background-light dark:bg-background-dark text-[#1a160f] dark:text-white">
@@ -329,6 +330,9 @@
                 <span class="material-symbols-outlined text-red-500">error</span>
                 Ocurrió un error al enviar el mensaje. Por favor, intenta de nuevo.
               </div>
+
+              <div class="g-recaptcha" data-sitekey="281474620974-pat7v4pddke8bfvs5bcsb5ndker6744h.apps.googleusercontent.com"></div>
+              <span id="error-captcha" class="hidden text-sm text-red-500">Por favor, completa el reCAPTCHA.</span>
 
               <button id="submit-btn" onclick="sendMail()"
                 class="mt-2 flex h-12 w-full cursor-pointer items-center justify-center rounded-lg bg-primary px-6 text-base font-bold text-[#1a160f] shadow-sm transition-colors hover:bg-[#c98e2b]"
