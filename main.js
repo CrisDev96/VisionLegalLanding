@@ -57,8 +57,14 @@ function sendMail() {
     hasError = true;
   }
 
-  // Validar reCAPTCHA
-  const captchaResponse = grecaptcha.getResponse();
+  // Validar reCAPTCHA Enterprise Checkbox
+  let captchaResponse = "";
+  if (typeof grecaptcha !== 'undefined' && grecaptcha.enterprise) {
+    captchaResponse = grecaptcha.enterprise.getResponse();
+  } else {
+    console.warn("reCAPTCHA Enterprise no está cargado.");
+  }
+
   if (!captchaResponse) {
     showError("captcha", "Por favor, completa el reCAPTCHA.");
     hasError = true;
@@ -75,6 +81,7 @@ function sendMail() {
     numberUser: numberUser,
     serviceRequired: serviceRequired,
     message: message,
+    'g-recaptcha-response': captchaResponse
   };
 
   const submitBtn = document.getElementById("submit-btn");
@@ -105,14 +112,18 @@ function sendMail() {
       
       // Limpiar los datos del formulario
       document.getElementById("contact-form").reset();
-      grecaptcha.reset();
+      if (typeof grecaptcha !== 'undefined' && grecaptcha.enterprise) {
+        grecaptcha.enterprise.reset();
+      }
     })
     .catch((error) => {
       console.error("Error al enviar:", error);
       // Mostrar el mensaje de error en la interfaz
       if (errorMsg) errorMsg.classList.remove("hidden");
       if (successMsg) successMsg.classList.add("hidden");
-      grecaptcha.reset();
+      if (typeof grecaptcha !== 'undefined' && grecaptcha.enterprise) {
+        grecaptcha.enterprise.reset();
+      }
     })
     .finally(() => {
       // Restaurar el botón independientemente del resultado

@@ -39,6 +39,20 @@
   </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
   <script type="text/javascript">
+      window.renderRecaptcha = function() {
+        if (typeof grecaptcha !== 'undefined' && grecaptcha.enterprise && window.appConfig && window.appConfig.recaptchaSiteKey) {
+          grecaptcha.enterprise.ready(function() {
+            grecaptcha.enterprise.render('recaptcha-container', {
+              'sitekey': window.appConfig.recaptchaSiteKey
+            });
+          });
+        }
+      };
+
+      window.onloadCallback = function() {
+        window.renderRecaptcha();
+      };
+
       (function () {
         // Obtenemos el YAML y lo parseamos
         fetch('config.yaml')
@@ -51,11 +65,13 @@
             emailjs.init({
               publicKey: window.appConfig.emailJSPublicKey,
             });
+
+            window.renderRecaptcha();
           })
           .catch(err => console.error("Error al cargar config.yaml", err));
       })();
   </script>
-  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+  <script src="https://www.google.com/recaptcha/enterprise.js?onload=onloadCallback&render=explicit" async defer></script>
 </head>
 
 <body class="bg-background-light dark:bg-background-dark text-[#1a160f] dark:text-white">
@@ -330,8 +346,7 @@
                 <span class="material-symbols-outlined text-red-500">error</span>
                 Ocurrió un error al enviar el mensaje. Por favor, intenta de nuevo.
               </div>
-
-              <div class="g-recaptcha" data-sitekey="281474620974-pat7v4pddke8bfvs5bcsb5ndker6744h.apps.googleusercontent.com"></div>
+              <div id="recaptcha-container"></div>
               <span id="error-captcha" class="hidden text-sm text-red-500">Por favor, completa el reCAPTCHA.</span>
 
               <button id="submit-btn" onclick="sendMail()"
