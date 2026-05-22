@@ -1,4 +1,15 @@
 function sendMail() {
+  // Verificar que la configuración esté disponible
+  if (!window.__CONFIG) {
+    console.error('Configuración no disponible');
+    const errorMsg = document.getElementById("form-error-message");
+    if (errorMsg) {
+      errorMsg.classList.remove("hidden");
+      setTimeout(() => errorMsg.classList.add("hidden"), 3000);
+    }
+    return;
+  }
+
   const firstName = document.getElementById("first-name").value.trim();
   const lastName = document.getElementById("last-name").value.trim();
   const emailUser = document.getElementById("email-user").value.trim();
@@ -22,16 +33,12 @@ function sendMail() {
   });
 
   // Expresiones regulares para validación
-  // Permite letras (incluyendo acentos y la ñ) y espacios
   const nameRegex = /^[A-Za-zÁ-ÿñÑ\s]+$/;
-  // Validación básica de correo electrónico
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  // Validación de número de contacto (solo números)
   const phoneRegex = /^[0-9]+$/;
 
   let hasError = false;
 
-  // Realizar validaciones
   if (!firstName || !nameRegex.test(firstName)) {
     showError("first-name", "Ingresa un nombre válido (solo letras).");
     hasError = true;
@@ -57,12 +64,10 @@ function sendMail() {
     hasError = true;
   }
 
-  // Validar reCAPTCHA Enterprise Checkbox
+  // Validar reCAPTCHA
   let captchaResponse = "";
   if (typeof grecaptcha !== 'undefined' && grecaptcha.enterprise) {
     captchaResponse = grecaptcha.enterprise.getResponse();
-  } else {
-    console.warn("reCAPTCHA Enterprise no está cargado.");
   }
 
   if (!captchaResponse) {
@@ -71,7 +76,7 @@ function sendMail() {
   }
 
   if (hasError) {
-    return; // Detener el envío si hay errores
+    return;
   }
 
   let params = {
@@ -88,29 +93,24 @@ function sendMail() {
   const successMsg = document.getElementById("form-success-message");
   const errorMsg = document.getElementById("form-error-message");
 
-  // Ocultar mensajes de estado al iniciar un nuevo intento de envío
   if (successMsg) successMsg.classList.add("hidden");
   if (errorMsg) errorMsg.classList.add("hidden");
 
-  // Cambiar estado del botón a "Enviando" temporalmente
   submitBtn.textContent = "Enviando...";
   submitBtn.disabled = true;
   submitBtn.classList.add("opacity-70", "cursor-not-allowed");
 
-  // Enviar el formulario a EmailJS usando las variables cargadas desde el config.yaml
-  emailjs.send(window.appConfig.emailJSService, window.appConfig.emailJSTemplate, params)
+  // Usar la configuración desde window.__CONFIG
+  emailjs.send(window.__CONFIG.emailJSService, window.__CONFIG.emailJSTemplate, params)
     .then((response) => {
-      // Ocultar error por si acaso y mostrar el mensaje de éxito en la interfaz
       if (errorMsg) errorMsg.classList.add("hidden");
       if (successMsg) {
         successMsg.classList.remove("hidden");
-        // Ocultar el mensaje automáticamente despues de 3 segundos
         setTimeout(() => {
           successMsg.classList.add("hidden");
         }, 3000);
       }
       
-      // Limpiar los datos del formulario
       document.getElementById("contact-form").reset();
       if (typeof grecaptcha !== 'undefined' && grecaptcha.enterprise) {
         grecaptcha.enterprise.reset();
@@ -118,7 +118,6 @@ function sendMail() {
     })
     .catch((error) => {
       console.error("Error al enviar:", error);
-      // Mostrar el mensaje de error en la interfaz
       if (errorMsg) errorMsg.classList.remove("hidden");
       if (successMsg) successMsg.classList.add("hidden");
       if (typeof grecaptcha !== 'undefined' && grecaptcha.enterprise) {
@@ -126,7 +125,6 @@ function sendMail() {
       }
     })
     .finally(() => {
-      // Restaurar el botón independientemente del resultado
       submitBtn.textContent = "Enviar Mensaje";
       submitBtn.disabled = false;
       submitBtn.classList.remove("opacity-70", "cursor-not-allowed");

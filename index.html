@@ -37,39 +37,32 @@
   </style>
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js">
   </script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+  <script src="config.js"></script>
+
   <script type="text/javascript">
-      window.renderRecaptcha = function() {
-        if (typeof grecaptcha !== 'undefined' && grecaptcha.enterprise && window.appConfig && window.appConfig.recaptchaSiteKey) {
-          grecaptcha.enterprise.ready(function() {
-            grecaptcha.enterprise.render('recaptcha-container', {
-              'sitekey': window.appConfig.recaptchaSiteKey
+        window.renderRecaptcha = function() {
+          if (typeof grecaptcha !== 'undefined' && grecaptcha.enterprise && window.__CONFIG && window.__CONFIG.recaptchaSiteKey) {
+            grecaptcha.enterprise.ready(function() {
+              grecaptcha.enterprise.render('recaptcha-container', {
+                'sitekey': window.__CONFIG.recaptchaSiteKey
+              });
             });
+          }
+        };
+
+        window.onloadCallback = function() {
+          window.renderRecaptcha();
+        };
+
+        // Inicializar EmailJS con la configuración
+        if (window.__CONFIG) {
+          emailjs.init({
+            publicKey: window.__CONFIG.emailJSPublicKey,
           });
+          console.log('EmailJS inicializado correctamente');
+        } else {
+          console.error('Configuración no cargada');
         }
-      };
-
-      window.onloadCallback = function() {
-        window.renderRecaptcha();
-      };
-
-      (function () {
-        // Obtenemos el YAML y lo parseamos
-        fetch('config.yaml')
-          .then(res => res.text())
-          .then(yamlText => {
-            // Guardamos la configuración de manera global para poder usarla en main.js
-            window.appConfig = jsyaml.load(yamlText);
-
-            // Inicializamos EmailJS con la llave pública
-            emailjs.init({
-              publicKey: window.appConfig.emailJSPublicKey,
-            });
-
-            window.renderRecaptcha();
-          })
-          .catch(err => console.error("Error al cargar config.yaml", err));
-      })();
   </script>
   <script src="https://www.google.com/recaptcha/enterprise.js?onload=onloadCallback&render=explicit" async defer></script>
 </head>
